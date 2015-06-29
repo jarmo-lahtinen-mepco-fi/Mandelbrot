@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html ng-app="MandelbrotApp">
+    <head>
+        <title>Mandelbrot</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>        
+        <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+        <script src="client.js"></script>      
+    </head>
+    <body ng-controller="MandelbrotController">
+        <div class="container">
+        <div class="jumbotron">
+            <h1>Mandelbrot</h1>
+            <p>Resize this responsive page to see the effect!</p> 
+        </div>
+            <div class="row">
+                <div class="col-sm-9 col-md-9 col-lg-9">
+                    <div>
+                        <canvas id='mandelbrotcanvas' width="800" height="600" onClick="getCoordinates(event);" style="border:1px solid #000000"></canvas>
+                    </div>
+                    <div>
+                        <form ng-submit="addcontact()">
+                            Enter name: <input type="text" ng-model="mandelbrot.name"/><br>
+                            <input type="submit" value="Add"/><br><br>
+                        </form>
+                    </div>
+                    <div>
+                        <form ng-submit="findbyid()">
+                            <input type="submit" value="Find"/>
+                        </form>
+                    </div>
+                    <div>
+                        <form ng-submit="findall()">
+                            <input type="submit" value="Find all"/><br><br>
+                        </form>
+                    </div>        
+                <hr>
+                <div ng-repeat="contact in contacts">
+                    First name: {{contact.firstName}}
+                    <br>
+                    Last name: {{contact.lastName}}
+                    <br>
+                    Phone: {{contact.phoneNumber}}
+                    <br>
+                    Email: {{contact.emailAddress}}
+                    <hr>
+                </div>
+            </div>
+            <div class="col-sm-3 col-md-3 col-lg-3">
+                <h4>Image settings</h4>
+                <form>
+                    Iterations (0 - 5000):
+                    <input type="number" id="iteration_input" name="iteration" min="100" max="5000" step="100" value="500">
+                    <br>Zoom level (1 - 3):
+                    <input type="number" id="zoom_level" name="zoom" min="1" max="3" value="1">
+                    <br>RGB values (start):<br>
+                    <input type="number" id="R_start_value" name="r_start_value" min="0" max="255" step="5" value="255"><br>
+                    <input type="number" id="G_start_value" name="g_start_value" min="0" max="255" step="5" value="0"><br>
+                    <input type="number" id="B_start_value" name="b_start_value" min="0" max="255" step="5" value="0"><br>
+                    <br>RGB values (end):<br>
+                    <input type="number" id="R_end_value" name="r_end_value" min="0" max="255" step="5" value="255"><br>
+                    <input type="number" id="G_end_value" name="g_end_value" min="0" max="255" step="5" value="255"><br>
+                    <input type="number" id="B_end_value" name="b_end_value" min="0" max="255" step="5" value="0"><br>
+                    <canvas id="palette" width=200 height=60 style="border:1px solid #000000" onClick=""></canvas><br>
+                    <input type="button" id="iterationButton" value="Calculate!" onClick="drawMandelbrotSet();">
+                    <script type="text/javascript" src="mandelbrotcanvas.js"></script>
+                    <p id="coordinates"></p> 
+                </form>
+            </div>
+          </div>
+        </div>
+    </body>
+</html>
