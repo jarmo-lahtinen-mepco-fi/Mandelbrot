@@ -1,8 +1,8 @@
 var ox = -0.75;
 var oy = 0.0;
 var radius = 2.5;
-var width = 640;
-var height = 480;
+var width = 800;
+var height = 600;
 var xstart = 0;
 var xend = 0;
 var ystart = 0;
@@ -47,8 +47,13 @@ function drawMandelbrotSet() {
             rx = xstart + xzoom * x;
             iy = ystart + yzoom * y;
             c = getIterationCount(rx, iy); // color value
+            /*if (x % 20 === 0) {
+                console.log("rx = " + rx + ", iy = " + iy + ", c = " + c);
+            }*/
+            
             pos = x + (width * y);
-            if (c == 0) {
+            if (c === 256) {
+                //console.log("rx = " + rx + ", iy = " + iy + ", c = " + c);
                 pic.data[4*pos] = 0;
                 pic.data[4*pos+1] = 0;
                 pic.data[4*pos+2] = 0;
@@ -78,8 +83,9 @@ function getIterationCount(x, y) {
         real = mag + x;                         // iterated value, real part
         iterations++;
     }
-    while (iterations >= 256) {                 // If maximum iterations is more than 256,
-        iterations = iterations - 256;		// returned color value will be decreased by 256.
+    while (iterations > 255) {                 // If maximum iterations is more than 256,
+        //iterations = iterations - 256;		// returned color value will be decreased by 256.
+        return 256;
     }
     return iterations;
 }
@@ -87,13 +93,13 @@ function getIterationCount(x, y) {
 function resetValues(x, y, r) {
     console.log("resetValues()");
     radx = r;
-    rady = (480/640) * r;
+    rady = (height/width) * r;
     xstart = x - radx;
     xend = x + radx;
     ystart = y + rady;
     yend = y - rady;
-    xzoom = (xend - xstart) / 640;
-    yzoom = (yend - ystart) / 480;
+    xzoom = (xend - xstart) / width;
+    yzoom = (yend - ystart) / height;
 }
 
 function getCoordinates(event) {
@@ -144,11 +150,13 @@ function drawPalette(rs, gs, bs, re, ge, be) {
     console.log("drawPalette(): " + rs + ", " + gs + ", " + bs + ", " + re + ", " + ge + ", " + be);
     console.log("rs type: " + typeof rs);
     var gradientBox = document.getElementById("palette").getContext("2d"); 
-    var gradient=gradientBox.createLinearGradient(0,0,200,50);
-    var start = hexFromRGB(rs, gs, bs);
-    var end = hexFromRGB(re, ge, be);
-    gradient.addColorStop(0, start);
-    gradient.addColorStop(1, end);
+    var gradient = gradientBox.createLinearGradient(0,0,200,50);
+    var start = hexFromRGB(Number(rs), Number(gs), Number(bs));
+    var end = hexFromRGB(Number(re), Number(ge), Number(be));
+    //console.log("start: #" + start);
+    //console.log("end: #" + end);
+    gradient.addColorStop(0, "#" + start);
+    gradient.addColorStop(1, "#" + end);
     gradientBox.fillStyle = gradient; 
     gradientBox.fillRect(10, 10, 180, 40); 
 }
