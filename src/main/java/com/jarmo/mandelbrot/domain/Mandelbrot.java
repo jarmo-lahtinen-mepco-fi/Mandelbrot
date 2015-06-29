@@ -12,7 +12,7 @@ public class Mandelbrot {
     private int xstart;
     private int ystart;
     private int xzoom;
-    private int yzoom;    
+    private int yzoom;
     private int iterations;
 
     /**

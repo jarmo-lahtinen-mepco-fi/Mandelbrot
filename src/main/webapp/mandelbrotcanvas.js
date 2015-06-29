@@ -75,10 +75,10 @@ function getIterationCount(x, y) {
     while((iterations < maxIterations) && (mag < 4.0)) {
         mag = real * real - imag * imag;	// squared magnitude
         imag = 2.0 * real * imag + y;      	// iterated value, imaginary part
-        real = mag + x;                     // iterated value, real part
+        real = mag + x;                         // iterated value, real part
         iterations++;
     }
-    while (iterations >= 256) {             // If maximum iterations is more than 256,
+    while (iterations >= 256) {                 // If maximum iterations is more than 256,
         iterations = iterations - 256;		// returned color value will be decreased by 256.
     }
     return iterations;
@@ -143,10 +143,26 @@ function createPalette() { //startColor, endColor) {
 function drawPalette(rs, gs, bs, re, ge, be) {
     console.log("drawPalette(): " + rs + ", " + gs + ", " + bs + ", " + re + ", " + ge + ", " + be);
     console.log("rs type: " + typeof rs);
-    var gradientBox=document.getElementById("palette").getContext("2d"); 
+    var gradientBox = document.getElementById("palette").getContext("2d"); 
     var gradient=gradientBox.createLinearGradient(0,0,200,50);
-    gradient.addColorStop(0, 'rgb(Number(rs), Number(gs), Number(bs))');
-    gradient.addColorStop(1, 'rgb(re, ge, be)');
-    gradientBox.fillStyle=gradient; 
+    var start = hexFromRGB(rs, gs, bs);
+    var end = hexFromRGB(re, ge, be);
+    gradient.addColorStop(0, start);
+    gradient.addColorStop(1, end);
+    gradientBox.fillStyle = gradient; 
     gradientBox.fillRect(10, 10, 180, 40); 
+}
+
+function hexFromRGB(r, g, b) {
+    var hex = [
+        r.toString(16),
+        g.toString(16),
+        b.toString(16)
+    ];
+    $.each( hex, function( nr, val ) {
+        if ( val.length === 1 ) {
+            hex[ nr ] = "0" + val;
+        }
+    });
+    return hex.join( "" ).toUpperCase();
 }
