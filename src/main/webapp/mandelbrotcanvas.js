@@ -33,8 +33,8 @@ drawMandelbrotSet();
 function drawMandelbrotSet() {
     //var object = document.getElementById("iteration_input");
     //maxIterations = object.value;
-    createPalette();
     drawPalette(255, 0, 0, 255, 255, 0);	
+    createPalette();
     maxIterations = document.getElementById("iteration_input").value;
     console.log("drawMandelbrotSet(): " + maxIterations);
     var canvas = document.getElementById("mandelbrotcanvas").getContext("2d");
@@ -91,7 +91,7 @@ function getIterationCount(x, y) {
 }
 
 function resetValues(x, y, r) {
-    console.log("resetValues()");
+    console.log("resetValues(): x = " + x + ", y = " + y + ", r = " + r);
     radx = r;
     rady = (height/width) * r;
     xstart = x - radx;
@@ -116,18 +116,6 @@ function getCoordinates(event) {
 
 //http://jqueryui.com/slider/#colorpicker
 function createPalette() { //startColor, endColor) {
-    /*var rstart = startColor >> 16;
-    var gstart = (startColor - (rstart<<16)) >> 8;
-    var bstart = startColor - (rstart<<16) - (gstart<<8);
-    var rend = endColor >> 16;
-    var gend = (endColor - (rend<<16)) >> 8;
-    var bend = endColor - (rend<<16) - (gend<<8);*/
-    rstart = document.getElementById("R_start_value").value;
-    gstart = document.getElementById("G_start_value").value;
-    bstart = document.getElementById("B_start_value").value;
-    rend = document.getElementById("R_end_value").value;
-    gend = document.getElementById("G_end_value").value;
-    bend = document.getElementById("B_end_value").value;
     console.log("createPalette(): " + rstart + ", " + gstart + ", " + bstart);
     console.log("createPalette(): " + rend + ", " + gend + ", " + bend);
     var r = rstart;
@@ -153,8 +141,8 @@ function drawPalette(rs, gs, bs, re, ge, be) {
     var gradient = gradientBox.createLinearGradient(0,0,200,50);
     var start = hexFromRGB(Number(rs), Number(gs), Number(bs));
     var end = hexFromRGB(Number(re), Number(ge), Number(be));
-    //console.log("start: #" + start);
-    //console.log("end: #" + end);
+    console.log("start: #" + start);
+    console.log("end: #" + end);
     gradient.addColorStop(0, "#" + start);
     gradient.addColorStop(1, "#" + end);
     gradientBox.fillStyle = gradient; 
@@ -172,5 +160,50 @@ function hexFromRGB(r, g, b) {
             hex[ nr ] = "0" + val;
         }
     });
-    return hex.join( "" ).toUpperCase();
+    return hex.join("").toUpperCase();
 }
+
+function refreshStartSwatch() {
+    rstart = $("#redstart").slider("value");
+    gstart = $("#greenstart").slider("value");
+    bstart = $("#bluestart").slider("value");
+    hexstart = hexFromRGB( rstart, gstart, bstart);
+    $("#swatchstart").css("background-color", "#" + hexstart);
+    drawPalette(rstart, gstart, bstart, rend, gend, bend);
+}
+$(function() {
+    $("#redstart, #greenstart, #bluestart").slider({
+        orientation: "horizontal",
+        range: "min",
+        max: 255,
+        value: 127,
+        slide: refreshStartSwatch,
+        change: refreshStartSwatch
+    });
+    $("#redstart").slider("value", 255);
+    $("#greenstart").slider("value", 140);
+    $("#bluestart").slider("value", 60);
+    drawPalette(rstart, gstart, bstart, rend, gend, bend);
+});
+
+function refreshEndSwatch() {
+    rend = $("#redend").slider("value");
+    gend = $("#greenend").slider("value");
+    bend = $("#blueend").slider("value");
+    hexend = hexFromRGB( rend, gend, bend);
+    $("#swatchend").css("background-color", "#" + hexend);
+    drawPalette(rstart, gstart, bstart, rend, gend, bend);
+}
+$(function() {
+    $("#redend, #greenend, #blueend").slider({
+        orientation: "horizontal",
+        range: "min",
+        max: 255,
+        value: 127,
+        slide: refreshEndSwatch,
+        change: refreshEndSwatch
+    });
+    $("#redend").slider("value", 255);
+    $("#greenend").slider("value", 140);
+    $("#blueend").slider("value", 60);
+});
