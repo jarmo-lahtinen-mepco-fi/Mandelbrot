@@ -14,15 +14,16 @@ var yzoom = 0;
 var zoom1 = 0.8;
 var zoom2 = 0.5;
 var zoom3 = 0.2;
+var zoom = zoom1;
 var maxIterations = 512;
 var r_values = new Array(255);
 var g_values = new Array(255);
 var b_values = new Array(255);
-var rstart = 0;
+var rstart = 255;
 var gstart = 0;
 var bstart = 0;
-var rend = 0;
-var gend = 0;
+var rend = 255;
+var gend = 255;
 var bend = 0;
 
 resetValues(ox, oy, radius);
@@ -105,13 +106,33 @@ function resetValues(x, y, r) {
 function getCoordinates(event) {
     console.log("getCoordinates()");
     var canvas = document.getElementById('mandelbrotcanvas');
-    var x = event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft - canvas.offsetLeft;
-    var y = event.clientY + document.body.scrollTop + document.documentElement.scrollTop - canvas.offsetTop;
+    var position = getPosition(canvas);
+    alert("The image is located at: " + position.x + ", " + position.y);
+    //var x = event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft - canvas.offsetLeft;
+    //var y = event.clientY + document.body.scrollTop + document.documentElement.scrollTop - canvas.offsetTop;
+    //var x = event.clientX - getOffset(document.getElementById('mandelbrotcanvas')).left;
+    //var y = event.clientY - getOffset(document.getElementById('mandelbrotcanvas')).top;
+    var x = event.clientX - position.x;
+    var y = event.clientY - position.y;
     var rx = xstart + xzoom * x;
     var iy = ystart + yzoom * y;
     document.getElementById('coordinates').innerHTML = "xstart: " + xstart + "<br>" + "ystart: " + ystart + "<br>" 
     	+ "xend: " + xend + "<br>" + "yend: " + yend + "<br>" + "xzoom: " + xzoom + "<br>" + "yzoom: " + yzoom 
     	+ "<br>" + "x=" + x + ", y=" + y + "<br>" + "rx=" + rx + ", iy=" + iy + "<br>" + "max iterations: " + maxIterations;
+    //drawMandelbrotSet();
+}
+
+function getPosition(element) {
+    // from: http://www.kirupa.com/html5/get_element_position_using_javascript.htm
+    var xPosition = 0;
+    var yPosition = 0;
+  
+    while(element) {
+        xPosition += (element.offsetLeft - element.scrollLeft + element.clientLeft);
+        yPosition += (element.offsetTop - element.scrollTop + element.clientTop);
+        element = element.offsetParent;
+    }
+    return { x: xPosition, y: yPosition };
 }
 
 //http://jqueryui.com/slider/#colorpicker
@@ -149,6 +170,18 @@ function drawPalette(rs, gs, bs, re, ge, be) {
     gradientBox.fillRect(10, 10, 180, 40); 
 }
 
+function getOffset(el) {
+    var x = 0;
+    var y = 0;
+    while(el && !isNaN(el.offsetLeft) && !isNaN(el.offsetTop)) {
+        x += el.offsetLeft - el.scrollLeft;
+        y += el.offsetTop - el.scrollTop;
+        el = el.offsetParent;
+    }
+    return {top: y, left: x};
+}
+//var x = getOffset( document.getElementById('yourElId') ).left; 
+
 function hexFromRGB(r, g, b) {
     var hex = [
         r.toString(16),
@@ -181,8 +214,8 @@ $(function() {
         change: refreshStartSwatch
     });
     $("#redstart").slider("value", 255);
-    $("#greenstart").slider("value", 140);
-    $("#bluestart").slider("value", 60);
+    $("#greenstart").slider("value", 0);
+    $("#bluestart").slider("value", 0);
     drawPalette(rstart, gstart, bstart, rend, gend, bend);
 });
 
@@ -204,6 +237,6 @@ $(function() {
         change: refreshEndSwatch
     });
     $("#redend").slider("value", 255);
-    $("#greenend").slider("value", 140);
-    $("#blueend").slider("value", 60);
+    $("#greenend").slider("value", 255);
+    $("#blueend").slider("value", 0);
 });
