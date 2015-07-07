@@ -14,7 +14,7 @@ var yzoom = 0;
 var zoom1 = 0.8;
 var zoom2 = 0.5;
 var zoom3 = 0.2;
-var zoom = zoom1;
+var zoom = 1.0;
 var maxIterations = 512;
 var r_values = new Array(255);
 var g_values = new Array(255);
@@ -25,23 +25,27 @@ var bstart = 0;
 var rend = 255;
 var gend = 255;
 var bend = 0;
+var scrolledVal = 0;
+var rx = 0;
+var iy = 0;
 
 resetValues(ox, oy, radius);
 createPalette();
-console.log("xstart: " + xstart + "\nystart: " + ystart + "\nxend: " + xend + "\nyend: " + yend + "\nxzoom: " + xzoom + "\nyzoom: " + yzoom);
 drawMandelbrotSet();
 
 function drawMandelbrotSet() {
+    console.log("drawMandelbrotSet(): rx = " + rx + ", iy = " + iy);
+    console.log("drawMandelbrotSet(): xstart: " + xstart + "\nystart: " + ystart + "\nxend: " + xend + "\nyend: " + yend + "\nxzoom: " + xzoom + "\nyzoom: " + yzoom);
     //var object = document.getElementById("iteration_input");
     //maxIterations = object.value;
     drawPalette(255, 0, 0, 255, 255, 0);	
     createPalette();
     maxIterations = document.getElementById("iteration_input").value;
-    console.log("drawMandelbrotSet(): " + maxIterations);
+    //console.log("drawMandelbrotSet(): " + maxIterations);
     var canvas = document.getElementById("mandelbrotcanvas").getContext("2d");
     var pic = canvas.createImageData(width, height);
-    var rx = 0;
-    var iy = 0;
+    //var rx = 0;
+    //var iy = 0;
     var pos = 0;
     for (y = 0; y < height; y++) {
         for (x = 0; x < width; x++) {
@@ -104,32 +108,43 @@ function resetValues(x, y, r) {
 }
 
 function getCoordinates(event) {
-    console.log("getCoordinates()");
+    //console.log("getCoordinates()");
     var canvas = document.getElementById('mandelbrotcanvas');
     var position = getPosition(canvas);
-    alert("The image is located at: " + position.x + ", " + position.y);
+    //alert("The image is located at: " + position.x + ", " + position.y);
     //var x = event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft - canvas.offsetLeft;
     //var y = event.clientY + document.body.scrollTop + document.documentElement.scrollTop - canvas.offsetTop;
     //var x = event.clientX - getOffset(document.getElementById('mandelbrotcanvas')).left;
     //var y = event.clientY - getOffset(document.getElementById('mandelbrotcanvas')).top;
     var x = event.clientX - position.x;
-    var y = event.clientY - position.y;
+    //console.log("event.clientY: " + event.clientY + ", position.y: " + position.y);
+    var y = event.clientY - position.y + scrolledVal;
     var rx = xstart + xzoom * x;
     var iy = ystart + yzoom * y;
-    document.getElementById('coordinates').innerHTML = "xstart: " + xstart + "<br>" + "ystart: " + ystart + "<br>" 
-    	+ "xend: " + xend + "<br>" + "yend: " + yend + "<br>" + "xzoom: " + xzoom + "<br>" + "yzoom: " + yzoom 
-    	+ "<br>" + "x=" + x + ", y=" + y + "<br>" + "rx=" + rx + ", iy=" + iy + "<br>" + "max iterations: " + maxIterations;
-    //drawMandelbrotSet();
+    document.getElementById('coordinates').innerHTML = "xstart: " + xstart + ", ystart: " + ystart + "<br>" 
+    	+ "xend: " + xend + ", yend: " + yend + "<br>" + "xzoom: " + xzoom + ", yzoom: " + yzoom 
+    	+ "<br>" + "x=" + x + ", y=" + y + "<br>" + "rx=" + rx + ", iy=" + iy + "<br>" + "scrolled Y: " + scrolledVal;
+    zoom = zoom * zoom1;
+    resetValues(rx, iy, zoom);
+    drawMandelbrotSet(rx, iy);
 }
 
 function getPosition(element) {
     // from: http://www.kirupa.com/html5/get_element_position_using_javascript.htm
     var xPosition = 0;
     var yPosition = 0;
-  
+    var offsetX = 0;
+    var offsetY = 0;
     while(element) {
-        xPosition += (element.offsetLeft - element.scrollLeft + element.clientLeft);
-        yPosition += (element.offsetTop - element.scrollTop + element.clientTop);
+        offsetX = element.offsetLeft - element.scrollLeft + element.clientLeft;
+        offsetY = element.offsetTop - element.scrollTop + element.clientTop;
+        //console.log("element: " + element.toString() + ": X: " + offsetX + ", Y: " + offsetY);
+        //console.log("offsetTop: " + element.offsetTop);
+        //console.log("scrollTop: " + element.scrollTop);
+        //console.log("clientTop: " + element.clientTop);
+        //console.log("scrolledVal: " + scrolledVal);
+        xPosition += offsetX;
+        yPosition += offsetY;
         element = element.offsetParent;
     }
     return { x: xPosition, y: yPosition };
@@ -137,8 +152,8 @@ function getPosition(element) {
 
 //http://jqueryui.com/slider/#colorpicker
 function createPalette() { //startColor, endColor) {
-    console.log("createPalette(): " + rstart + ", " + gstart + ", " + bstart);
-    console.log("createPalette(): " + rend + ", " + gend + ", " + bend);
+    //console.log("createPalette(): " + rstart + ", " + gstart + ", " + bstart);
+    //console.log("createPalette(): " + rend + ", " + gend + ", " + bend);
     var r = rstart;
     var g = gstart;
     var b = bstart;
@@ -156,14 +171,14 @@ function createPalette() { //startColor, endColor) {
 }
 
 function drawPalette(rs, gs, bs, re, ge, be) {
-    console.log("drawPalette(): " + rs + ", " + gs + ", " + bs + ", " + re + ", " + ge + ", " + be);
-    console.log("rs type: " + typeof rs);
+    //console.log("drawPalette(): " + rs + ", " + gs + ", " + bs + ", " + re + ", " + ge + ", " + be);
+    //console.log("rs type: " + typeof rs);
     var gradientBox = document.getElementById("palette").getContext("2d"); 
     var gradient = gradientBox.createLinearGradient(0,0,200,50);
     var start = hexFromRGB(Number(rs), Number(gs), Number(bs));
     var end = hexFromRGB(Number(re), Number(ge), Number(be));
-    console.log("start: #" + start);
-    console.log("end: #" + end);
+    //console.log("start: #" + start);
+    //console.log("end: #" + end);
     gradient.addColorStop(0, "#" + start);
     gradient.addColorStop(1, "#" + end);
     gradientBox.fillStyle = gradient; 
@@ -239,4 +254,9 @@ $(function() {
     $("#redend").slider("value", 255);
     $("#greenend").slider("value", 255);
     $("#blueend").slider("value", 0);
+});
+
+$(window).scroll( function() { 
+    scrolledVal = $(document).scrollTop().valueOf();
+    //alert(scrolled_val+ ' = scroll value');
 });
