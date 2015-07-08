@@ -1,0 +1,35 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Jul 8, 2015, 3:28:55 PM
+    Author     : lahtinja
+*/
+#redstart, #redend, #greenstart, #greenend, #bluestart, #blueend {
+    float: left;
+    clear: left;
+    width: 200px;
+    margin: 15px;
+}
+#swatchstart, #swatchend {
+    width: 120px;
+    height: 100px;
+    margin-top: 18px;
+    margin-left: 250px;
+    background-image: none;
+}
+#rstart .ui-slider-range { background: #ef2929; }
+#rstart .ui-slider-handle { border-color: #ef2929; }
+#gstart .ui-slider-range { background: #8ae234; }
+#gstart .ui-slider-handle { border-color: #8ae234; }
+#bstart .ui-slider-range { background: #729fcf; }
+#bstart .ui-slider-handle { border-color: #729fcf; }
+#rend .ui-slider-range { background: #ef2929; }
+#rend .ui-slider-handle { border-color: #ef2929; }
+#gend .ui-slider-range { background: #8ae234; }
+#gend .ui-slider-handle { border-color: #8ae234; }
+#bend .ui-slider-range { background: #729fcf; }
+#bend .ui-slider-handle { border-color: #729fcf; }
+#palette { margin: 10px }
