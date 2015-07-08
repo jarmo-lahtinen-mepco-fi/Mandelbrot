@@ -14,33 +14,38 @@ var yzoom = 0;
 var zoom1 = 0.8;
 var zoom2 = 0.5;
 var zoom3 = 0.2;
+var zoom = 1.0;
 var maxIterations = 512;
 var r_values = new Array(255);
 var g_values = new Array(255);
 var b_values = new Array(255);
-var rstart = 0;
+var rstart = 255;
 var gstart = 0;
 var bstart = 0;
-var rend = 0;
-var gend = 0;
+var rend = 255;
+var gend = 255;
 var bend = 0;
+var scrolledVal = 0;
+var rx = 0;
+var iy = 0;
 
 resetValues(ox, oy, radius);
 createPalette();
-console.log("xstart: " + xstart + "\nystart: " + ystart + "\nxend: " + xend + "\nyend: " + yend + "\nxzoom: " + xzoom + "\nyzoom: " + yzoom);
 drawMandelbrotSet();
 
 function drawMandelbrotSet() {
+    console.log("drawMandelbrotSet(): rx = " + rx + ", iy = " + iy);
+    console.log("drawMandelbrotSet(): xstart: " + xstart + "\nystart: " + ystart + "\nxend: " + xend + "\nyend: " + yend + "\nxzoom: " + xzoom + "\nyzoom: " + yzoom);
     //var object = document.getElementById("iteration_input");
     //maxIterations = object.value;
-    createPalette();
     drawPalette(255, 0, 0, 255, 255, 0);	
+    createPalette();
     maxIterations = document.getElementById("iteration_input").value;
-    console.log("drawMandelbrotSet(): " + maxIterations);
+    //console.log("drawMandelbrotSet(): " + maxIterations);
     var canvas = document.getElementById("mandelbrotcanvas").getContext("2d");
     var pic = canvas.createImageData(width, height);
-    var rx = 0;
-    var iy = 0;
+    //var rx = 0;
+    //var iy = 0;
     var pos = 0;
     for (y = 0; y < height; y++) {
         for (x = 0; x < width; x++) {
@@ -91,7 +96,7 @@ function getIterationCount(x, y) {
 }
 
 function resetValues(x, y, r) {
-    console.log("resetValues()");
+    console.log("resetValues(): x = " + x + ", y = " + y + ", r = " + r);
     radx = r;
     rady = (height/width) * r;
     xstart = x - radx;
@@ -103,33 +108,52 @@ function resetValues(x, y, r) {
 }
 
 function getCoordinates(event) {
-    console.log("getCoordinates()");
+    //console.log("getCoordinates()");
     var canvas = document.getElementById('mandelbrotcanvas');
-    var x = event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft - canvas.offsetLeft;
-    var y = event.clientY + document.body.scrollTop + document.documentElement.scrollTop - canvas.offsetTop;
+    var position = getPosition(canvas);
+    //alert("The image is located at: " + position.x + ", " + position.y);
+    //var x = event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft - canvas.offsetLeft;
+    //var y = event.clientY + document.body.scrollTop + document.documentElement.scrollTop - canvas.offsetTop;
+    //var x = event.clientX - getOffset(document.getElementById('mandelbrotcanvas')).left;
+    //var y = event.clientY - getOffset(document.getElementById('mandelbrotcanvas')).top;
+    var x = event.clientX - position.x;
+    //console.log("event.clientY: " + event.clientY + ", position.y: " + position.y);
+    var y = event.clientY - position.y + scrolledVal;
     var rx = xstart + xzoom * x;
     var iy = ystart + yzoom * y;
-    document.getElementById('coordinates').innerHTML = "xstart: " + xstart + "<br>" + "ystart: " + ystart + "<br>" 
-    	+ "xend: " + xend + "<br>" + "yend: " + yend + "<br>" + "xzoom: " + xzoom + "<br>" + "yzoom: " + yzoom 
-    	+ "<br>" + "x=" + x + ", y=" + y + "<br>" + "rx=" + rx + ", iy=" + iy + "<br>" + "max iterations: " + maxIterations;
+    document.getElementById('coordinates').innerHTML = "xstart: " + xstart + ", ystart: " + ystart + "<br>" 
+    	+ "xend: " + xend + ", yend: " + yend + "<br>" + "xzoom: " + xzoom + ", yzoom: " + yzoom 
+    	+ "<br>" + "x=" + x + ", y=" + y + "<br>" + "rx=" + rx + ", iy=" + iy + "<br>" + "scrolled Y: " + scrolledVal;
+    zoom = zoom * zoom1;
+    resetValues(rx, iy, zoom);
+    drawMandelbrotSet(rx, iy);
+}
+
+function getPosition(element) {
+    // from: http://www.kirupa.com/html5/get_element_position_using_javascript.htm
+    var xPosition = 0;
+    var yPosition = 0;
+    var offsetX = 0;
+    var offsetY = 0;
+    while(element) {
+        offsetX = element.offsetLeft - element.scrollLeft + element.clientLeft;
+        offsetY = element.offsetTop - element.scrollTop + element.clientTop;
+        //console.log("element: " + element.toString() + ": X: " + offsetX + ", Y: " + offsetY);
+        //console.log("offsetTop: " + element.offsetTop);
+        //console.log("scrollTop: " + element.scrollTop);
+        //console.log("clientTop: " + element.clientTop);
+        //console.log("scrolledVal: " + scrolledVal);
+        xPosition += offsetX;
+        yPosition += offsetY;
+        element = element.offsetParent;
+    }
+    return { x: xPosition, y: yPosition };
 }
 
 //http://jqueryui.com/slider/#colorpicker
 function createPalette() { //startColor, endColor) {
-    /*var rstart = startColor >> 16;
-    var gstart = (startColor - (rstart<<16)) >> 8;
-    var bstart = startColor - (rstart<<16) - (gstart<<8);
-    var rend = endColor >> 16;
-    var gend = (endColor - (rend<<16)) >> 8;
-    var bend = endColor - (rend<<16) - (gend<<8);*/
-    rstart = document.getElementById("R_start_value").value;
-    gstart = document.getElementById("G_start_value").value;
-    bstart = document.getElementById("B_start_value").value;
-    rend = document.getElementById("R_end_value").value;
-    gend = document.getElementById("G_end_value").value;
-    bend = document.getElementById("B_end_value").value;
-    console.log("createPalette(): " + rstart + ", " + gstart + ", " + bstart);
-    console.log("createPalette(): " + rend + ", " + gend + ", " + bend);
+    //console.log("createPalette(): " + rstart + ", " + gstart + ", " + bstart);
+    //console.log("createPalette(): " + rend + ", " + gend + ", " + bend);
     var r = rstart;
     var g = gstart;
     var b = bstart;
@@ -147,8 +171,8 @@ function createPalette() { //startColor, endColor) {
 }
 
 function drawPalette(rs, gs, bs, re, ge, be) {
-    console.log("drawPalette(): " + rs + ", " + gs + ", " + bs + ", " + re + ", " + ge + ", " + be);
-    console.log("rs type: " + typeof rs);
+    //console.log("drawPalette(): " + rs + ", " + gs + ", " + bs + ", " + re + ", " + ge + ", " + be);
+    //console.log("rs type: " + typeof rs);
     var gradientBox = document.getElementById("palette").getContext("2d"); 
     var gradient = gradientBox.createLinearGradient(0,0,200,50);
     var start = hexFromRGB(Number(rs), Number(gs), Number(bs));
@@ -161,6 +185,18 @@ function drawPalette(rs, gs, bs, re, ge, be) {
     gradientBox.fillRect(10, 10, 180, 40); 
 }
 
+function getOffset(el) {
+    var x = 0;
+    var y = 0;
+    while(el && !isNaN(el.offsetLeft) && !isNaN(el.offsetTop)) {
+        x += el.offsetLeft - el.scrollLeft;
+        y += el.offsetTop - el.scrollTop;
+        el = el.offsetParent;
+    }
+    return {top: y, left: x};
+}
+//var x = getOffset( document.getElementById('yourElId') ).left; 
+
 function hexFromRGB(r, g, b) {
     var hex = [
         r.toString(16),
@@ -172,5 +208,55 @@ function hexFromRGB(r, g, b) {
             hex[ nr ] = "0" + val;
         }
     });
-    return hex.join( "" ).toUpperCase();
+    return hex.join("").toUpperCase();
 }
+
+function refreshStartSwatch() {
+    rstart = $("#redstart").slider("value");
+    gstart = $("#greenstart").slider("value");
+    bstart = $("#bluestart").slider("value");
+    hexstart = hexFromRGB( rstart, gstart, bstart);
+    $("#swatchstart").css("background-color", "#" + hexstart);
+    drawPalette(rstart, gstart, bstart, rend, gend, bend);
+}
+$(function() {
+    $("#redstart, #greenstart, #bluestart").slider({
+        orientation: "horizontal",
+        range: "min",
+        max: 255,
+        value: 127,
+        slide: refreshStartSwatch,
+        change: refreshStartSwatch
+    });
+    $("#redstart").slider("value", 255);
+    $("#greenstart").slider("value", 0);
+    $("#bluestart").slider("value", 0);
+    drawPalette(rstart, gstart, bstart, rend, gend, bend);
+});
+
+function refreshEndSwatch() {
+    rend = $("#redend").slider("value");
+    gend = $("#greenend").slider("value");
+    bend = $("#blueend").slider("value");
+    hexend = hexFromRGB( rend, gend, bend);
+    $("#swatchend").css("background-color", "#" + hexend);
+    drawPalette(rstart, gstart, bstart, rend, gend, bend);
+}
+$(function() {
+    $("#redend, #greenend, #blueend").slider({
+        orientation: "horizontal",
+        range: "min",
+        max: 255,
+        value: 127,
+        slide: refreshEndSwatch,
+        change: refreshEndSwatch
+    });
+    $("#redend").slider("value", 255);
+    $("#greenend").slider("value", 255);
+    $("#blueend").slider("value", 0);
+});
+
+$(window).scroll( function() { 
+    scrolledVal = $(document).scrollTop().valueOf();
+    //alert(scrolled_val+ ' = scroll value');
+});
